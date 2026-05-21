@@ -28,7 +28,10 @@ export async function blockAds(page: Page): Promise<void> {
       url.includes('adservice') || 
       url.includes('analytics') || 
       url.includes('vignette') ||
-      url.includes('adsbygoogle')
+      url.includes('adsbygoogle') ||
+      url.includes('quantserve') ||
+      url.includes('facebook') ||
+      url.includes('twitter')
     ) {
       void route.abort();
     } else {

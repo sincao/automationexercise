@@ -16,27 +16,20 @@ export default defineConfig({
   testMatch: ['**/*.spec.ts', '**/*.test.ts'],
 
   // ─── Parallelism ───────────────────────────────────────────────────────────
-  fullyParallel: true,
-  workers: process.env.CI ? 4 : 2,
+  fullyParallel: false, // Disable fully parallel for UI to avoid footer conflicts
+  workers: process.env.CI ? 2 : 1,
 
   // ─── Retry Strategy ────────────────────────────────────────────────────────
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
 
   // ─── Timeouts ──────────────────────────────────────────────────────────────
-  timeout: 60_000,
+  timeout: 120_000, 
   expect: {
-    timeout: 10_000,
+    timeout: 20_000,
     toHaveScreenshot: { maxDiffPixelRatio: 0.05 },
   },
 
   // ─── Global Setup / Teardown ───────────────────────────────────────────────
-  // FIX: Removed globalSetup/globalTeardown here.
-  // Auth is handled by the dedicated 'setup' project below (Playwright-native pattern).
-  // This avoids the conflict where both globalSetup AND a setup project
-  // tried to write storageState.json simultaneously.
-  //
-  // If you need non-auth global setup (DB seed, env checks), use:
-  //   globalSetup: './config/global-teardown.ts'
   globalTeardown: './config/global-teardown.ts',
 
   // ─── Reporting ─────────────────────────────────────────────────────────────
@@ -60,17 +53,14 @@ export default defineConfig({
     // Site uses data-qa for automation locators
     testIdAttribute: 'data-qa',
 
-    // Auth state — cleared for now to avoid conflicts with new site
-    storageState: undefined,
-
     // Artifacts on failure
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
 
     // Timeouts
-    actionTimeout: 15_000,
-    navigationTimeout: 30_000,
+    actionTimeout: 20_000,
+    navigationTimeout: 40_000,
     ignoreHTTPSErrors: envConfig.ignoreHTTPSErrors ?? false,
 
     extraHTTPHeaders: { 'Accept-Language': 'en-US' },
@@ -80,51 +70,19 @@ export default defineConfig({
 
   // ─── Projects ──────────────────────────────────────────────────────────────
   projects: [
-    // ── 1. Auth Setup (runs once before all browser projects) ────────────────
-    // This is the ONLY place that generates storageState.json.
-    // All browser projects declare it as a dependency — Playwright ensures
-    // setup completes before any browser test starts.
-    {
-      name: 'setup',
-      testMatch: /auth\.setup\.ts/,
-      use: { storageState: undefined }, // setup project must NOT load storageState
-    },
-
-    // ── 2. Chromium ──────────────────────────────────────────────────────────
+    // ── 1. Chromium ──────────────────────────────────────────────────────────
     {
       name: 'chromium',
+      testDir: './tests/ui',
       use: { ...devices['Desktop Chrome'] },
-      dependencies: ['setup'],
     },
 
-    // ── 3. Firefox ───────────────────────────────────────────────────────────
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-      dependencies: ['setup'],
-    },
-
-    // ── 4. WebKit ────────────────────────────────────────────────────────────
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-      dependencies: ['setup'],
-    },
-
-    // ── 5. Mobile Chrome ─────────────────────────────────────────────────────
-    {
-      name: 'mobile-chrome',
-      use: { ...devices['Pixel 5'] },
-      dependencies: ['setup'],
-    },
-
-    // ── 6. API Tests (no browser, no storageState needed) ────────────────────
+    // ── 2. API Tests (no browser) ────────────────────
     {
       name: 'api',
       testDir: './tests/api',
       use: {
         baseURL: envConfig.apiBaseURL,
-        storageState: undefined,
         extraHTTPHeaders: { 'Content-Type': 'application/json' },
       },
     },

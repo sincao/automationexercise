@@ -17,7 +17,7 @@ test.describe('Authentication', () => {
     await page.goto('/');
     await expect(page).toHaveTitle(/Automation Exercise/);
     await page.getByRole('link', { name: 'Signup / Login' }).click();
-    await expect(page.getByRole('heading', { name: 'New User Signup!' })).toBeVisible();
+    await signupPage.assertPageLoaded();
     await signupPage.fillInitialSignup(user.fullName, user.email);
     await expect(page.getByText('Enter Account Information')).toBeVisible();
     await signupPage.fillAccountDetails(user);
