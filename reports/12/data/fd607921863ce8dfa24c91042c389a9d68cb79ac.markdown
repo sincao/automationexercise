@@ -1,0 +1,155 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: ui/cart/cart.spec.ts >> Cart & Subscriptions >> Test Case 12: Add Products in Cart @smoke
+- Location: tests/ui/cart/cart.spec.ts:27:7
+
+# Error details
+
+```
+TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 15000ms exceeded.
+Call log:
+  - waiting for locator('.single-products').first()
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e4]: Please wait while your request is being verified...
+```
+
+# Test source
+
+```ts
+  1   | import { Page } from '@playwright/test';
+  2   | import { BasePage } from '@pages/base.page';
+  3   | import { ProductLocators } from '@locators/product.locators';
+  4   | import { logStep } from '@utils/logger';
+  5   | 
+  6   | export class ProductPage extends BasePage {
+  7   |   private readonly locators: ProductLocators;
+  8   | 
+  9   |   constructor(page: Page) {
+  10  |     super(page);
+  11  |     this.locators = new ProductLocators(page);
+  12  |   }
+  13  | 
+  14  |   get path(): string { return '/products'; }
+  15  | 
+  16  |   async assertPageLoaded(): Promise<void> {
+  17  |     await this.locators.allProductsHeading.waitFor({ state: 'visible' });
+  18  |   }
+  19  | 
+  20  |   async searchProduct(name: string) {
+  21  |     logStep(`Searching for product: ${name}`);
+  22  |     await this.locators.searchInput.waitFor({ state: 'visible' });
+  23  |     await this.locators.searchInput.fill(name);
+  24  |     await this.locators.searchButton.click();
+  25  |     // Special wait for search result to stabilize
+  26  |     await this.page.waitForLoadState('networkidle');
+  27  |   }
+  28  | 
+  29  |   async viewFirstProduct() {
+  30  |     logStep('Viewing first product detail');
+  31  |     await this.locators.viewProductButtons.first().scrollIntoViewIfNeeded();
+  32  |     await this.locators.viewProductButtons.first().click();
+  33  |   }
+  34  | 
+  35  |   async addFirstProductToCart() {
+  36  |     logStep('Adding first product to cart');
+> 37  |     await this.locators.productItems.first().scrollIntoViewIfNeeded();
+      |                                              ^ TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 15000ms exceeded.
+  38  |     await this.locators.productItems.first().locator('.add-to-cart').first().click();
+  39  |     await this.locators.addToCartModal.waitFor({ state: 'visible', timeout: 10_000 });
+  40  |   }
+  41  | 
+  42  |   async addSecondProductToCart() {
+  43  |     logStep('Adding second product to cart');
+  44  |     await this.locators.productItems.nth(1).scrollIntoViewIfNeeded();
+  45  |     await this.locators.productItems.nth(1).locator('.add-to-cart').first().click();
+  46  |     await this.locators.addToCartModal.waitFor({ state: 'visible', timeout: 10_000 });
+  47  |   }
+  48  | 
+  49  |   async clickContinueShopping() {
+  50  |     logStep('Closing product added modal');
+  51  |     await this.locators.addToCartModal.waitFor({ state: 'visible' });
+  52  |     await this.locators.modalContinueShoppingButton.click();
+  53  |     await this.locators.addToCartModal.waitFor({ state: 'hidden' });
+  54  |   }
+  55  | 
+  56  |   async clickViewCart() {
+  57  |     logStep('Navigating to cart from modal');
+  58  |     await this.locators.addToCartModal.waitFor({ state: 'visible' });
+  59  |     await this.locators.modalViewCartLink.click();
+  60  |   }
+  61  | 
+  62  |   async setQuantity(qty: number) {
+  63  |     logStep(`Setting quantity to ${qty}`);
+  64  |     await this.locators.quantityInput.waitFor({ state: 'visible' });
+  65  |     await this.locators.quantityInput.clear();
+  66  |     await this.locators.quantityInput.fill(qty.toString());
+  67  |   }
+  68  | 
+  69  |   async addToCartFromDetail() {
+  70  |     logStep('Click Add to Cart from detail page');
+  71  |     await this.locators.addToCartDetailButton.click();
+  72  |     await this.locators.addToCartModal.waitFor({ state: 'visible' });
+  73  |   }
+  74  | 
+  75  |   async addReview(name: string, email: string, review: string) {
+  76  |     logStep('Adding product review');
+  77  |     await this.locators.reviewNameInput.scrollIntoViewIfNeeded();
+  78  |     await this.locators.reviewNameInput.fill(name);
+  79  |     await this.locators.reviewEmailInput.fill(email);
+  80  |     await this.locators.reviewTextArea.fill(review);
+  81  |     await this.locators.reviewSubmitButton.click();
+  82  |   }
+  83  | 
+  84  |   async getReviewSuccessMessage(): Promise<string> {
+  85  |     await this.locators.reviewSuccessMsg.waitFor({ state: 'visible', timeout: 15_000 });
+  86  |     return (await this.locators.reviewSuccessMsg.textContent()) ?? '';
+  87  |   }
+  88  | 
+  89  |   async selectCategory(main: 'Women' | 'Men', sub: string) {
+  90  |     logStep(`Selecting category: ${main} -> ${sub}`);
+  91  |     const mainLoc = main === 'Women' ? this.locators.womenCategory : this.locators.menCategory;
+  92  |     await mainLoc.scrollIntoViewIfNeeded();
+  93  |     await mainLoc.click();
+  94  |     const subLoc = this.page.locator('#' + main).getByRole('link', { name: sub });
+  95  |     await subLoc.waitFor({ state: 'visible' });
+  96  |     await subLoc.click();
+  97  |   }
+  98  | 
+  99  |   async addRecommendedProductToCart() {
+  100 |     logStep('Adding recommended product to cart');
+  101 |     await this.locators.recommendedItemsHeading.scrollIntoViewIfNeeded();
+  102 |     const btn = this.locators.recommendedAddToCartButtons.first();
+  103 |     await btn.waitFor({ state: 'visible' });
+  104 |     await btn.click();
+  105 |   }
+  106 | 
+  107 |   // ─── State Readers ────────────────────────────────────────────────────────
+  108 | 
+  109 |   async getProductInfo() {
+  110 |     return {
+  111 |       name: await this.locators.productName.textContent(),
+  112 |       category: await this.locators.productCategory.textContent(),
+  113 |       price: await this.locators.productPrice.textContent(),
+  114 |       availability: await this.locators.productAvailability.textContent(),
+  115 |       condition: await this.locators.productCondition.textContent(),
+  116 |       brand: await this.locators.productBrand.textContent(),
+  117 |     };
+  118 |   }
+  119 | 
+  120 |   async getProductCount(): Promise<number> {
+  121 |     return this.locators.productItems.count();
+  122 |   }
+  123 | }
+  124 | 
+```

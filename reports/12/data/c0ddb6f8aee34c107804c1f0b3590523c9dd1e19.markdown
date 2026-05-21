@@ -1,0 +1,67 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: ui/auth/authentication.spec.ts >> Authentication >> Test Case 3: Login User with incorrect email and password @smoke @auth
+- Location: tests/ui/auth/authentication.spec.ts:57:7
+
+# Error details
+
+```
+TimeoutError: locator.click: Timeout 15000ms exceeded.
+Call log:
+  - waiting for getByRole('link', { name: 'Signup / Login' })
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [ref=e4]: Please wait while your request is being verified...
+```
+
+# Test source
+
+```ts
+  1  | import { Page } from '@playwright/test';
+  2  | import { BasePage } from '@pages/base.page';
+  3  | import { LoginLocators } from '@locators/login.locators';
+  4  | import { logStep } from '@utils/logger';
+  5  | 
+  6  | export class LoginPage extends BasePage {
+  7  |   private readonly locators: LoginLocators;
+  8  | 
+  9  |   constructor(page: Page) {
+  10 |     super(page);
+  11 |     this.locators = new LoginLocators(page);
+  12 |   }
+  13 | 
+  14 |   get path(): string { return '/login'; }
+  15 | 
+  16 |   async assertPageLoaded(): Promise<void> {
+  17 |     await this.locators.signupLoginLink.waitFor({ state: 'visible', timeout: 15_000 });
+  18 |   }
+  19 | 
+  20 |   async goToCreateAccount(): Promise<void> {
+  21 |     logStep('Navigate to Signup / Login page');
+> 22 |     await this.locators.signupLoginLink.click();
+     |                                         ^ TimeoutError: locator.click: Timeout 15000ms exceeded.
+  23 |   }
+  24 | 
+  25 |   async login(email: string, password: string): Promise<void> {
+  26 |     logStep(`Login with Email: ${email}`);
+  27 |     await this.locators.loginEmailInput.fill(email);
+  28 |     await this.locators.loginPasswordInput.fill(password);
+  29 |     await this.locators.loginButton.click();
+  30 |   }
+  31 | 
+  32 |   async getLoginErrorMessage(): Promise<string> {
+  33 |     return (await this.locators.loginErrorMessage.textContent()) ?? '';
+  34 |   }
+  35 | }
+  36 | 
+```
