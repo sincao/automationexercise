@@ -1,3 +1,5 @@
+import { Page, Route } from '@playwright/test';
+
 /**
  * General-purpose utility helpers.
  */
@@ -6,7 +8,7 @@
  * Handle Google Vignette ads on automationexercise.com.
  * Forces navigation back to clean URL if redirected to #google_vignette.
  */
-export async function handleAds(page: any): Promise<void> {
+export async function handleAds(page: Page): Promise<void> {
   if (page.url().includes('#google_vignette')) {
     const cleanUrl = page.url().split('#')[0];
     await page.goto(cleanUrl, { waitUntil: 'networkidle' });
@@ -17,8 +19,8 @@ export async function handleAds(page: any): Promise<void> {
  * Robust Ad-blocker: Intercepts and aborts all known ad/tracking requests.
  * This is the most effective way to handle ads on practice sites.
  */
-export async function blockAds(page: any): Promise<void> {
-  await page.route('**/*', (route) => {
+export async function blockAds(page: Page): Promise<void> {
+  await page.route('**/*', (route: Route) => {
     const url = route.request().url();
     if (
       url.includes('google') || 
