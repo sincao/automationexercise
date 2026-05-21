@@ -13,6 +13,10 @@ export class LoginPage extends BasePage {
 
   get path(): string { return '/login'; }
 
+  async assertPageLoaded(): Promise<void> {
+    await this.locators.signupLoginLink.waitFor({ state: 'visible', timeout: 15_000 });
+  }
+
   async goToCreateAccount(): Promise<void> {
     logStep('Navigate to Signup / Login page');
     await this.locators.signupLoginLink.click();

@@ -19,6 +19,17 @@ export interface UserData {
   password: string;
   phone: string;
   username: string;
+  title: 'Mr.' | 'Mrs.';
+  days: string;
+  months: string;
+  years: string;
+  company: string;
+  address1: string;
+  address2: string;
+  country: string;
+  state: string;
+  city: string;
+  zipCode: string;
 }
 
 export interface AddressData {

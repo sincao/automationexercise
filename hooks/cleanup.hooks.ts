@@ -1,38 +1,9 @@
 import { Page } from '@playwright/test';
 import { logger } from '@utils/logger';
-import { UserApiService } from '@api-services/user.api.service';
-import { APIRequestContext } from '@playwright/test';
 
 /**
  * Shared hooks — reusable setup/teardown logic for test suites.
- *
- * Usage:
- *   import { cleanupTestUsers } from '@hooks/cleanup.hooks';
- *   test.afterAll(async ({ authenticatedApiContext }) => {
- *     await cleanupTestUsers(authenticatedApiContext, createdUserIds);
- *   });
  */
-
-/**
- * Delete a list of users by ID — use in afterAll to clean up test data.
- */
-export async function cleanupTestUsers(
-  apiContext: APIRequestContext,
-  userIds: string[],
-): Promise<void> {
-  const service = new UserApiService(apiContext);
-  const results = await Promise.allSettled(
-    userIds.map((id) => service.deleteUser(id)),
-  );
-
-  results.forEach((result, index) => {
-    if (result.status === 'rejected') {
-      logger.warn(`[Cleanup] Failed to delete user ${userIds[index]}: ${result.reason}`);
-    } else {
-      logger.info(`[Cleanup] Deleted user: ${userIds[index]}`);
-    }
-  });
-}
 
 /**
  * Clear browser cookies and localStorage — use to reset auth state between tests.
@@ -51,7 +22,7 @@ export async function clearBrowserState(page: Page): Promise<void> {
  */
 export async function blockAnalytics(page: Page): Promise<void> {
   await page.route(/google-analytics|segment|mixpanel|hotjar|intercom/, (route) => {
-    route.abort();
+    void route.abort();
   });
   logger.debug('[Hook] Analytics requests blocked');
 }
@@ -66,7 +37,7 @@ export async function mockFeatureFlag(
 ): Promise<void> {
   await page.route('**/api/feature-flags**', async (route) => {
     const response = await route.fetch();
-    const body = await response.json();
+    const body = await response.json() as Record<string, boolean>;
     body[flagName] = enabled;
     await route.fulfill({ json: body });
   });
@@ -74,7 +45,7 @@ export async function mockFeatureFlag(
 }
 
 /**
- * Suppress expected console errors during tests (e.g., 401 from expired token test).
+ * Suppress expected console errors during tests.
  */
 export function suppressConsoleErrors(page: Page, patterns: RegExp[]): void {
   page.on('console', (msg) => {

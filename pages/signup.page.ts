@@ -14,6 +14,10 @@ export class SignupPage extends BasePage {
 
   get path(): string { return '/login'; }
 
+  async assertPageLoaded(): Promise<void> {
+    await this.locators.signupNameInput.waitFor({ state: 'visible', timeout: 15_000 });
+  }
+
   async fillInitialSignup(name: string, email: string) {
     logStep(`Signup with Name: ${name}, Email: ${email}`);
     await this.locators.signupNameInput.fill(name);

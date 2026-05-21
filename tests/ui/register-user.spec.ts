@@ -5,7 +5,6 @@ import { TAGS } from '../../constants';
 test.describe('User Management', () => {
   test(`Test Case 1: Register User ${TAGS.SMOKE} ${TAGS.REGRESSION}`, async ({ 
     page, 
-    loginPage, 
     signupPage 
   }) => {
     const user = DataFactory.user();
