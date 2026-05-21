@@ -1,2 +1,2 @@
 export { LoginLocators } from './login.locators';
-export { DashboardLocators } from './dashboard.locators';
+export { SignupLocators } from './signup.locators';

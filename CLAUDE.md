@@ -1,6 +1,16 @@
-# CLAUDE.md — AI Context for Playwright Enterprise Framework
+# CLAUDE.md & GEMINI.md — AI Context for Playwright Enterprise Framework
 
 > **AI assistants: read this entire file before writing any code.**
+> This file serves as the primary guidance for both Claude Code and Gemini CLI (Antigravity).
+
+---
+
+## 🤖 TOOL MAPPING (Gemini CLI / Antigravity)
+If you are operating as Gemini CLI, use these equivalent tools for the instructions below:
+- `Read` / `Grep` / `Glob` -> `read_file` / `grep_search` / `glob`
+- `Edit` -> `replace`
+- `Write` -> `write_file`
+- `Bash` -> `run_shell_command`
 
 ---
 
@@ -264,9 +274,9 @@ import { LoginPage } from '../../pages/login.page';
 
 ---
 
-## AI Prompt Template
+## AI Prompt Template (Gemini CLI Optimized)
 
-Use this when asking AI to generate new feature coverage:
+Use this when asking me (Gemini CLI) to generate new feature coverage:
 
 ```
 Context: Playwright enterprise framework. Rules in CLAUDE.md.
@@ -281,5 +291,5 @@ Generate in order:
 2. pages/your-feature.page.ts
 3. tests/ui/your-feature.spec.ts
 
-Follow all rules in CLAUDE.md. No relative imports. No expect() in pages.
+Follow all rules in CLAUDE.md. Use path aliases (@pages, @locators). No expect() in pages.
 ```

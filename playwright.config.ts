@@ -57,8 +57,11 @@ export default defineConfig({
     headless: true,
     viewport: { width: 1280, height: 720 },
 
-    // Auth state — populated by the 'setup' project before any tests run
-    storageState: './config/auth/storageState.json',
+    // Site uses data-qa for automation locators
+    testIdAttribute: 'data-qa',
+
+    // Auth state — cleared for now to avoid conflicts with new site
+    storageState: undefined,
 
     // Artifacts on failure
     screenshot: 'only-on-failure',

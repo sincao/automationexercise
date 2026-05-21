@@ -1,13 +1,27 @@
-node_modules/
-dist/
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports (node)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
 # Test artifacts
 test-results/
 playwright-report/
-reports/html-report/
-reports/logs/
-reports/junit/
-reports/json/
+reports/
+blob-report/
+playwright/.cache/
 
 # Auth state — never commit, contains session tokens
 config/auth/storageState.json
@@ -24,14 +38,15 @@ Thumbs.db
 .vscode/
 .idea/
 *.suo
-*.swp
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # TypeScript build
+dist/
 *.js.map
 *.d.ts.map
 
-# Never commit auth state
-config/auth/storageState.json
-
-# Local AI notes (optional personal overrides of CLAUDE.md)
+# Local AI notes
 CLAUDE.local.md

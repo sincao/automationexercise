@@ -64,6 +64,17 @@ export const DataFactory = {
       password: `Test${faker.internet.password({ length: 10 })}1!`,
       phone: faker.phone.number(),
       username: `${firstName.toLowerCase()}_${timestamp}`,
+      title: faker.helpers.arrayElement(['Mr.', 'Mrs.']),
+      days: faker.number.int({ min: 1, max: 28 }).toString(),
+      months: faker.date.month(),
+      years: faker.number.int({ min: 1970, max: 2000 }).toString(),
+      company: faker.company.name(),
+      address1: faker.location.streetAddress(),
+      address2: faker.location.secondaryAddress(),
+      country: 'India', // Expected by the site
+      state: faker.location.state(),
+      city: faker.location.city(),
+      zipCode: faker.location.zipCode(),
       ...overrides,
     };
   },
