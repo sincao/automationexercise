@@ -1,6 +1,6 @@
 import { test, expect } from '../../../fixtures/test.fixture';
 import { TAGS } from '../../../constants';
-import { blockAds, handleAds } from '../../../utils/general.helpers';
+import { blockAds } from '../../../utils/general.helpers';
 
 test.describe('Products', () => {
 
@@ -38,7 +38,7 @@ test.describe('Products', () => {
     await expect(page.locator('.features_items h2').first()).toHaveText(/MEN - TSHIRTS PRODUCTS/i);
   });
 
-  test(`Test Case 19: View Brand Products ${TAGS.REGRESSION}`, async ({ page, productPage }) => {
+  test(`Test Case 19: View Brand Products ${TAGS.REGRESSION}`, async ({ page }) => {
     await page.goto('/products');
     await page.getByRole('link', { name: 'Polo' }).click();
     await expect(page.locator('.features_items h2').first()).toHaveText(/BRAND - POLO PRODUCTS/i);

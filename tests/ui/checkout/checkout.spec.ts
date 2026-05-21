@@ -36,7 +36,7 @@ test.describe('Checkout & Orders', () => {
   });
 
   test(`Test Case 23: Verify address details in checkout page ${TAGS.REGRESSION}`, async ({ 
-    page, productPage, cartPage, signupPage, checkoutPage, loginPage
+    page, productPage, cartPage, signupPage, checkoutPage
   }) => {
     const user = DataFactory.user();
     await page.goto('/');
@@ -58,7 +58,7 @@ test.describe('Checkout & Orders', () => {
   });
 
   test(`Test Case 24: Download Invoice after purchase order ${TAGS.REGRESSION}`, async ({ 
-    page, productPage, cartPage, signupPage, checkoutPage, paymentPage, loginPage
+    page, productPage, cartPage, signupPage, checkoutPage, paymentPage
   }) => {
     const user = DataFactory.user();
     await page.goto('/');
