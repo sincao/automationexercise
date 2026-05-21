@@ -1,0 +1,37 @@
+node_modules/
+dist/
+
+# Test artifacts
+test-results/
+playwright-report/
+reports/html-report/
+reports/logs/
+reports/junit/
+reports/json/
+
+# Auth state — never commit, contains session tokens
+config/auth/storageState.json
+
+# Environment secrets
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.swp
+
+# TypeScript build
+*.js.map
+*.d.ts.map
+
+# Never commit auth state
+config/auth/storageState.json
+
+# Local AI notes (optional personal overrides of CLAUDE.md)
+CLAUDE.local.md

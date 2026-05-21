@@ -1,0 +1,268 @@
+name: Playwright E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run full regression nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options: [dev, staging, prod]
+      test_suite:
+        description: 'Test suite to run'
+        required: false
+        default: 'smoke'
+        type: choice
+        options: [smoke, regression, sanity, all]
+      browser:
+        description: 'Browser'
+        required: false
+        default: 'chromium'
+        type: choice
+        options: [chromium, firefox, webkit, all]
+
+# Cancel in-progress runs on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────
+  # Lint & Type Check (fast gate before expensive E2E run)
+  # ──────────────────────────────────────────────────────────────────
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+  # ──────────────────────────────────────────────────────────────────
+  # Smoke Tests — run on every PR, fast feedback
+  # ──────────────────────────────────────────────────────────────────
+  smoke-tests:
+    name: Smoke Tests (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium]  # Only chromium for PRs — full matrix on main
+    env:
+      ENV: ${{ github.event.inputs.environment || 'staging' }}
+      BASE_URL: ${{ secrets.STAGING_BASE_URL }}
+      API_BASE_URL: ${{ secrets.STAGING_API_BASE_URL }}
+      DEFAULT_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+      DEFAULT_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install ${{ matrix.browser }} --with-deps
+
+      - name: Run smoke tests
+        run: npx playwright test --grep @smoke --project=${{ matrix.browser }}
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-results-${{ matrix.browser }}
+          path: |
+            test-results/
+            reports/
+          retention-days: 7
+
+  # ──────────────────────────────────────────────────────────────────
+  # Full Regression — runs on main merge + nightly
+  # ──────────────────────────────────────────────────────────────────
+  regression-tests:
+    name: Regression Tests (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    needs: smoke-tests
+    if: github.ref == 'refs/heads/main' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      ENV: ${{ github.event.inputs.environment || 'staging' }}
+      BASE_URL: ${{ secrets.STAGING_BASE_URL }}
+      API_BASE_URL: ${{ secrets.STAGING_API_BASE_URL }}
+      DEFAULT_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+      DEFAULT_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install ${{ matrix.browser }} --with-deps
+
+      - name: Run regression tests
+        run: npx playwright test --grep "@regression|@smoke" --project=${{ matrix.browser }}
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-results-${{ matrix.browser }}
+          path: |
+            test-results/
+            reports/
+          retention-days: 14
+
+  # ──────────────────────────────────────────────────────────────────
+  # API Tests — browser-independent, always run
+  # ──────────────────────────────────────────────────────────────────
+  api-tests:
+    name: API Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      ENV: ${{ github.event.inputs.environment || 'staging' }}
+      API_BASE_URL: ${{ secrets.STAGING_API_BASE_URL }}
+      DEFAULT_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+      DEFAULT_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: npx playwright install chromium --with-deps
+
+      - name: Run API tests
+        run: npx playwright test tests/api --project=api
+        env:
+          CI: true
+
+      - name: Upload API test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-results
+          path: reports/
+          retention-days: 7
+
+  # ──────────────────────────────────────────────────────────────────
+  # Publish HTML Report
+  # ──────────────────────────────────────────────────────────────────
+  publish-report:
+    name: Publish Test Report
+    runs-on: ubuntu-latest
+    needs: [smoke-tests, api-tests]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-results/
+
+      - name: Merge HTML reports
+        run: |
+          npx playwright merge-reports --reporter=html all-results/ 2>/dev/null || true
+
+      - name: Deploy report to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-report
+          destination_dir: reports/${{ github.run_number }}
+
+  # ──────────────────────────────────────────────────────────────────
+  # Slack Notification
+  # ──────────────────────────────────────────────────────────────────
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [smoke-tests, regression-tests, api-tests]
+    if: always() && (github.ref == 'refs/heads/main' || github.event_name == 'schedule')
+    steps:
+      - name: Notify Slack on failure
+        if: contains(needs.*.result, 'failure')
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "❌ E2E Tests FAILED on `${{ github.ref_name }}`",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "❌ *E2E Tests Failed*\n*Branch:* `${{ github.ref_name }}`\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+      - name: Notify Slack on success
+        if: "!contains(needs.*.result, 'failure')"
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "✅ E2E Tests PASSED on `${{ github.ref_name }}`"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
