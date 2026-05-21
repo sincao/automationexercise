@@ -1,0 +1,621 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: api/products.api.spec.ts >> Products API >> API 1: Get All Products List @api @smoke
+- Location: tests/api/products.api.spec.ts:5:7
+
+# Error details
+
+```
+Error: apiRequestContext.get: Max redirect count exceeded
+Call log:
+  - → GET https://automationexercise.com/api/productsList
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:17 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=b2f%2F%2BD1aGPXq4kj7hU6%2FMGRMvlyKTLo3KeBK1zW%2BscI4JBMVOujBAd0DXryBKBaCEJ%2BDiypAs6ZkvI0an%2FoZ1%2FMEnbR93mbhamAZKgnT5omVzHSOnSRROhZX03KumxrEMdnDrwl6S9Vc"}]}
+    - cf-ray: 9ff559257d2688ee-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:18 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=yATG%2Fzvskgup0uqZ75At02cuUcVEfMwROfl%2FPFB%2FSoVwiAKHfa0Av4AekfzYFdm1G36NtiidC3CdKbzfCAsA9RSHyoRUxuqJYNP8cH2ssvR%2Boin%2F1C9uKVxtX%2FBuPOM7pdBDLbyMxS2v"}]}
+    - cf-ray: 9ff559293f941a42-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:19 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=i0mojH%2B%2BAr2eb8fp5JB3hIgJd9FBuoN3JfiHdqvFeJovx7hWtGQ%2Fkc60ou1NLzmrrGaReggO%2F0o6udyGMrqIJMEfIucdE%2FCHNJnh15Bve8Wf7TRLF68yM6KfJQm1XzWEzynb4%2FoD4V%2F5"}]}
+    - cf-ray: 9ff5592cf973369b-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:19 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=0lRltaYkfw7HrQEpZJolzDz5X31qDno9v5vNoMGpk8%2BGtj92PcOa9QHeUGzeT%2F3vOXg9CYeaOF3eBNy8Nu2PUV%2BOp05Sq15afgsnaXnYg4nNl6py30zkz2iVyMevErMsiao%2Foumo27cE"}]}
+    - cf-ray: 9ff55930bd1028b8-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:20 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=V954pVMGGJJP7VaYzldaD43CueoiZlLoxD0ESJNnIay1ccwzDzVgNvel02TzGSdUtU3tus62vnRBbd17ePXSrnUh%2ByA1%2FVk6OQ%2FMw8iVLJHlgZsdsNvmiAW5vBbsgvWYQgNs%2BAKrVXFo"}]}
+    - cf-ray: 9ff559335bc1c9a1-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:20 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=86cbke84Zf7oz%2FA9%2BYcemLPA%2FuIbFwy%2B9BhVY4yXUQz43zELaxvU5E2vQPW1hAGMhdBcEXKOEBieKx5w7pVlVA8fu6s0mCrNIRTUeVHCLRaGm83M%2F50koZkd%2BKtefqgamSa7NJzvqWKq"}]}
+    - cf-ray: 9ff559371d59ff80-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:21 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=uevPk3bMGf9IHKPWTsXKSnpKudL4z%2FQ8Kh3GahG04Njw521N1HbpICoqgPyT3oktMonMfXDR5A3bEkzGfo8bJbfwSsOEunlEBmyPw%2FdvD6b2MNkHaIzwOV72j7qdjxUBOND0SDlW7K8e"}]}
+    - cf-ray: 9ff5593adf606cdb-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:21 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=XCpOun1DZvERTFGm8O5yZ9wJLopvycveB28zXPx57SfImP1Ox9JeqxO2%2Fvxeg2lbVMVTbHgrSnedWFwvAutx0YMEkw9X6DRkorGr%2BF0HCMNHkpUFcLb6veXqfUdQnRbJw%2Bp3RJWf%2BLEf"}]}
+    - cf-ray: 9ff5593d58c93f0b-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:21 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=GPfrB%2FbV2bGjpKuqFlPiLmJBLUjrc8bJNxy2sI5qgmIkFHOpE8DM6WJIjEI8e%2B4gZeXu3qIKJ9aXpnCRP8nVvmQ2SHryGAApAdoHtHcSfaG8LSI2uIuvcGpP0LZ9uFMHPex5mI%2F8c9jh"}]}
+    - cf-ray: 9ff5593fcd817d71-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:22 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=BMjuGrwQETlHkgw6flHzjJaFFye041Ec8ssmF0%2BF%2F8JvCEuW4lyHoiV%2F39CQBE2ZG%2FYNDbM6NWX%2B4vOY05eprKWrrqHVZn%2Ba8wm%2BDjpjj%2Fh5o1l%2BJPr0z%2B5yhtNCER%2FpMpEgch05rbAe"}]}
+    - cf-ray: 9ff559425c5a0664-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:23 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=4s1%2Bmb%2FQalSLbW%2Bv9d83I5b0dLdxB78s%2FbH51eSfW7CG44ZmgFMVJnGD1AwPEbcNkuhVQsBMkQo5N4wHy5JUcnJrmdnCO7%2FmvhfL2bavYqFQ71SoHgGnFJEr6mVBm7F5WBGr5WvsN1Pc"}]}
+    - cf-ray: 9ff559462cb5e61d-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:23 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=mY5UHgNddUX5Z4CjxjnSLwrISHHJS7GD1l1FxAJNQMBjAPaiTaguBL4fgcj08i4dHx4J4wc03uK8IRiyXarCpk8uR1OMWilomjLE1hlj2ZEGcUrx3sqtnsLGls%2BsOjv0lQEFN2kOt1QC"}]}
+    - cf-ray: 9ff55949ea0ce63b-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:23 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=ESEM6H9Gap%2B9MIcP1lYuY9Zcn5yU6WGQ87E94dFPc%2BmvQ62RjyTLfQfDMaNAH74FH9m0ODZpTt%2FqZG1MOGb9XY3pCQn4P0BsSe9dr3ziUa0nlX2tZyjx8ZPeLRoEJ%2FqHyQKWKrHtAGVi"}]}
+    - cf-ray: 9ff5594c5aec8791-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:24 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=v89GLqem2aY7wBaEvhgcbXOGb%2F0B15W16yzm6qZ1AfgAPtPw66y4GiWBUeT1wnC0h1sM%2BB0BxlJz9cUj4ruc5grdje6Mz%2F7AuRb6SY6NiK7uYuF86NWVqZsUAVD5mkx2O5UuwqWEb4ba"}]}
+    - cf-ray: 9ff5594eec250582-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:24 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=gMtsW1HuKDbVZKnF8%2Fr7orK7EfggodGMnj3z%2Ft%2BsDkPB1tGX7IzoF8xQfbCwMVCg2allo2a1PnYWrHDuzyf%2F3iqlvtg%2FPDsP%2F%2FxB27lqWqm9qhdrqIvCoNOLdsdMAFCAHS3rlAsm6J4B"}]}
+    - cf-ray: 9ff559516bae88ee-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:25 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=g90R6qAhFvcnNuI6%2FetaKJKJYbCzXUrv5udZjvwJbIftumbtfkBzIA3U74mgmbEsZM%2FAb4iN9s5ceXP9E8W%2Fk%2FlMiPrp%2FgakeorWgnMZJsVfuezJy%2FxdouLGQQMghx%2BBiYyesvLoZmP0"}]}
+    - cf-ray: 9ff559540ff6fbc1-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:25 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=h0NtIvmfduWnzNsJZwHI0Gt0lm4lwIIsIW2VVG13jTzHOsUW2p8Ml%2FvpB%2B53Nkshx8tPxM%2B%2Bfm1MLQ6tcCCaqK6Js0k0U4RKW9qB4a2cIc%2FMMh8MbjqLPn2%2BppVkVtawRuAb3O0WGKjx"}]}
+    - cf-ray: 9ff559567f091a42-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:26 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=6PNwpy747VQjuIYrMraw2Z9k0SLve9sOviIqNJWudWGAvJnjl2xGEgTbVYi5m5w4C883bT1kKMKi%2F8PH75BCcJe74eXe1zi7xZyDzNQ6cZ0OMb9%2B%2FlX3NVOpbOqZ5jWIsMSDwyOgQbNj"}]}
+    - cf-ray: 9ff5595a2a98369b-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:26 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=lWI0ppw2Lam3onXyzGb75lthsSsyejCh5SR9fqhEcnc%2Fopc8Y2VOePUvlfl68S9xyle2QEfbsJett4yLa%2BLas3xOgblIZxU13hv1iy5nN4FWZSTbGbWlsgTwcjE0sKdpUgw2%2BeQkK4JG"}]}
+    - cf-ray: 9ff5595cbff128b8-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:27 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=jor0OhOW6qpvdvwCxXrDnwRAQ1Rzl6T4ZemB7HCY9WbPD%2B7aF%2Bp8RxgP%2B%2BtmgLOXOOoUYmMvEKeguGUV2k3xMo6naMpajWKRhiOBVuB5PffFRkTv0F2LZiUNFJO%2FzJz34pGdcYSx%2Foyc"}]}
+    - cf-ray: 9ff5595f2b13c9a1-IAD
+    - alt-svc: h3=":443"; ma=86400
+  - → GET https://automationexercise.com/
+    - user-agent: Playwright/1.60.0 (x64; ubuntu 24.04) node/20.20 CI/1
+    - accept: */*
+    - accept-encoding: gzip,deflate,br
+    - Content-Type: application/json
+  - ← 302 Found
+    - date: Thu, 21 May 2026 17:37:27 GMT
+    - content-type: text/html; charset=utf-8
+    - transfer-encoding: chunked
+    - connection: keep-alive
+    - referrer-policy: same-origin
+    - x-frame-options: DENY
+    - x-content-type-options: nosniff
+    - x-powered-by: Phusion Passenger(R) 6.1.2
+    - location: /
+    - status: 302 Found
+    - server: cloudflare
+    - cf-cache-status: DYNAMIC
+    - nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+    - report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=OwsB0k4SLRmD9MJpFwigqCFgp%2BPUujCOaDgYcnQjljQ1a82qopd5QsEQ22l1Rxy7h%2FDWabTMabcLmkQkvMHn0KWsNgD75AVhyg0VG1JdegWYAyz2BDzs1bBdCDD11v93VxsOruxGUBEG"}]}
+    - cf-ray: 9ff55962da752c11-IAD
+    - alt-svc: h3=":443"; ma=86400
+
+```
+
+# Test source
+
+```ts
+  1   | import { APIRequestContext, APIResponse } from '@playwright/test';
+  2   | import { logApiRequest, logApiResponse, logger } from '@utils/logger';
+  3   | 
+  4   | /**
+  5   |  * BaseApiService — abstract base for all API service classes.
+  6   |  *
+  7   |  * Responsibilities:
+  8   |  *   - Centralise error handling for API requests
+  9   |  *   - Log all requests and responses
+  10  |  *   - Provide typed response parsing
+  11  |  *   - Manage common headers
+  12  |  *
+  13  |  * What it does NOT do:
+  14  |  *   - Business logic (that belongs in derived services)
+  15  |  *   - Assertions (those belong in test files)
+  16  |  */
+  17  | export abstract class BaseApiService {
+  18  |   protected readonly apiContext: APIRequestContext;
+  19  |   protected abstract readonly basePath: string;
+  20  | 
+  21  |   constructor(apiContext: APIRequestContext) {
+  22  |     this.apiContext = apiContext;
+  23  |   }
+  24  | 
+  25  |   // ─── HTTP Methods ─────────────────────────────────────────────────────────
+  26  | 
+  27  |   protected async get<T>(
+  28  |     path: string,
+  29  |     options?: { params?: Record<string, string | number>; headers?: Record<string, string> },
+  30  |   ): Promise<T> {
+  31  |     const url = this.buildUrl(path);
+  32  |     logApiRequest('GET', url);
+  33  |     const start = Date.now();
+  34  | 
+> 35  |     const response = await this.apiContext.get(url, {
+      |                                            ^ Error: apiRequestContext.get: Max redirect count exceeded
+  36  |       params: options?.params as Record<string, string>,
+  37  |       headers: options?.headers,
+  38  |     });
+  39  | 
+  40  |     logApiResponse(response.status(), url, Date.now() - start);
+  41  |     return this.parseResponse<T>(response);
+  42  |   }
+  43  | 
+  44  |   protected async post<T>(
+  45  |     path: string,
+  46  |     body?: unknown,
+  47  |     options?: { headers?: Record<string, string> },
+  48  |   ): Promise<T> {
+  49  |     const url = this.buildUrl(path);
+  50  |     logApiRequest('POST', url, body);
+  51  |     const start = Date.now();
+  52  | 
+  53  |     const response = await this.apiContext.post(url, {
+  54  |       data: body,
+  55  |       headers: options?.headers,
+  56  |     });
+  57  | 
+  58  |     logApiResponse(response.status(), url, Date.now() - start);
+  59  |     return this.parseResponse<T>(response);
+  60  |   }
+  61  | 
+  62  |   protected async put<T>(
+  63  |     path: string,
+  64  |     body?: unknown,
+  65  |     options?: { headers?: Record<string, string> },
+  66  |   ): Promise<T> {
+  67  |     const url = this.buildUrl(path);
+  68  |     logApiRequest('PUT', url, body);
+  69  |     const start = Date.now();
+  70  | 
+  71  |     const response = await this.apiContext.put(url, {
+  72  |       data: body,
+  73  |       headers: options?.headers,
+  74  |     });
+  75  | 
+  76  |     logApiResponse(response.status(), url, Date.now() - start);
+  77  |     return this.parseResponse<T>(response);
+  78  |   }
+  79  | 
+  80  |   protected async patch<T>(
+  81  |     path: string,
+  82  |     body?: unknown,
+  83  |   ): Promise<T> {
+  84  |     const url = this.buildUrl(path);
+  85  |     logApiRequest('PATCH', url, body);
+  86  |     const start = Date.now();
+  87  | 
+  88  |     const response = await this.apiContext.patch(url, { data: body });
+  89  | 
+  90  |     logApiResponse(response.status(), url, Date.now() - start);
+  91  |     return this.parseResponse<T>(response);
+  92  |   }
+  93  | 
+  94  |   protected async delete<T = void>(path: string): Promise<T> {
+  95  |     const url = this.buildUrl(path);
+  96  |     logApiRequest('DELETE', url);
+  97  |     const start = Date.now();
+  98  | 
+  99  |     const response = await this.apiContext.delete(url);
+  100 | 
+  101 |     logApiResponse(response.status(), url, Date.now() - start);
+  102 |     return this.parseResponse<T>(response);
+  103 |   }
+  104 | 
+  105 |   // ─── Response Parsing ─────────────────────────────────────────────────────
+  106 | 
+  107 |   protected async parseResponse<T>(response: APIResponse): Promise<T> {
+  108 |     if (!response.ok()) {
+  109 |       let errorBody: string;
+  110 |       try {
+  111 |         errorBody = JSON.stringify(await response.json());
+  112 |       } catch {
+  113 |         errorBody = await response.text();
+  114 |       }
+  115 | 
+  116 |       const error = new ApiError(
+  117 |         `API request failed: ${response.status()} ${response.statusText()} — ${response.url()}`,
+  118 |         response.status(),
+  119 |         errorBody,
+  120 |       );
+  121 | 
+  122 |       logger.error(`[API Error] ${error.message}`, { body: errorBody });
+  123 |       throw error;
+  124 |     }
+  125 | 
+  126 |     // 204 No Content
+  127 |     if (response.status() === 204) {
+  128 |       return undefined as T;
+  129 |     }
+  130 | 
+  131 |     try {
+  132 |       return await response.json() as T;
+  133 |     } catch {
+  134 |       return await response.text() as unknown as T;
+  135 |     }
+```
