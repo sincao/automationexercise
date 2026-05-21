@@ -1,6 +1,5 @@
 import { test as base } from '@playwright/test';
-import { LoginPage } from '@pages/login.page';
-import { SignupPage } from '@pages/signup.page';
+import { LoginPage, SignupPage, ContactUsPage, ProductPage, CartPage, CheckoutPage, PaymentPage } from '@pages';
 import { ProductApiService } from '@api-services/product.api.service';
 
 // ─── Fixture Type Definitions ────────────────────────────────────────────────
@@ -8,6 +7,11 @@ import { ProductApiService } from '@api-services/product.api.service';
 export interface PageFixtures {
   loginPage: LoginPage;
   signupPage: SignupPage;
+  contactUsPage: ContactUsPage;
+  productPage: ProductPage;
+  cartPage: CartPage;
+  checkoutPage: CheckoutPage;
+  paymentPage: PaymentPage;
 }
 
 export interface ApiFixtures {
@@ -22,13 +26,6 @@ type AllFixtures = PageFixtures & ApiFixtures & DataFixtures;
 
 // ─── Extended Test ────────────────────────────────────────────────────────────
 
-/**
- * Custom test object — extends Playwright's base `test` with project-specific fixtures.
- *
- * Usage:
- *   import { test, expect } from '@fixtures/test.fixture';
- *   test('register works', async ({ signupPage }) => { ... });
- */
 export const test = base.extend<AllFixtures>({
 
   // ── Page Object Fixtures ──────────────────────────────────────────────────
@@ -41,6 +38,26 @@ export const test = base.extend<AllFixtures>({
     await use(new SignupPage(page));
   },
 
+  contactUsPage: async ({ page }, use) => {
+    await use(new ContactUsPage(page));
+  },
+
+  productPage: async ({ page }, use) => {
+    await use(new ProductPage(page));
+  },
+
+  cartPage: async ({ page }, use) => {
+    await use(new CartPage(page));
+  },
+
+  checkoutPage: async ({ page }, use) => {
+    await use(new CheckoutPage(page));
+  },
+
+  paymentPage: async ({ page }, use) => {
+    await use(new PaymentPage(page));
+  },
+
   // ── API Fixtures ──────────────────────────────────────────────────────────
 
   productApiService: async ({ request }, use) => {
@@ -49,5 +66,4 @@ export const test = base.extend<AllFixtures>({
 
 });
 
-// Re-export expect so test files only need one import
 export { expect } from '@playwright/test';
