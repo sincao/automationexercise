@@ -28,4 +28,8 @@ export class LoginPage extends BasePage {
     await this.locators.loginPasswordInput.fill(password);
     await this.locators.loginButton.click();
   }
+
+  async getLoginErrorMessage(): Promise<string> {
+    return (await this.locators.loginErrorMessage.textContent()) ?? '';
+  }
 }

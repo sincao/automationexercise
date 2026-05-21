@@ -12,4 +12,6 @@ export class LoginLocators {
   get signupButton() { return this.page.getByTestId('signup-button'); }
 
   get signupLoginLink() { return this.page.getByRole('link', { name: 'Signup / Login' }); }
+
+  get loginErrorMessage() { return this.page.locator('.login-form p[style*="color: red"]'); }
 }
