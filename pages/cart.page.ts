@@ -40,6 +40,10 @@ export class CartPage extends BasePage {
     await this.locators.removeButtons.first().click();
   }
 
+  getCartItemsLocator() {
+    return this.locators.cartItems;
+  }
+
   async getCartProductCount(): Promise<number> {
     return this.locators.cartItems.count();
   }

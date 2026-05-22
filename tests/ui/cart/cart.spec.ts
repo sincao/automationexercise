@@ -30,7 +30,7 @@ test.describe('Cart & Subscriptions', () => {
     await productPage.clickContinueShopping();
     await productPage.addSecondProductToCart();
     await productPage.clickViewCart();
-    expect(await cartPage.getCartProductCount()).toBe(2);
+    await expect(cartPage.getCartItemsLocator()).toHaveCount(2);
   });
 
   test(`Test Case 13: Verify Product quantity in Cart ${TAGS.REGRESSION}`, async ({ page, productPage }) => {
