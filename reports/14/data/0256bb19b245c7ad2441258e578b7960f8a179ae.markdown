@@ -1,0 +1,94 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: ui/cart/cart.spec.ts >> Cart & Subscriptions >> Test Case 12: Add Products in Cart @smoke
+- Location: tests/ui/cart/cart.spec.ts:27:7
+
+# Error details
+
+```
+Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: 2
+Received: 0
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - heading "This website is under heavy load (queue full)" [level=2] [ref=e2]
+  - paragraph [ref=e3]: We're sorry, too many people are accessing this website at the same time. We're working on this problem. Please try again later.
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '../../../fixtures/test.fixture';
+  2  | import { DataFactory } from '../../../utils/data.factory';
+  3  | import { TAGS } from '../../../constants';
+  4  | import { blockAds } from '../../../utils/general.helpers';
+  5  | 
+  6  | test.describe('Cart & Subscriptions', () => {
+  7  |   // Use serial mode because shared footer (subscription) is flaky in parallel
+  8  |   test.describe.configure({ mode: 'serial' });
+  9  | 
+  10 |   test.beforeEach(async ({ page }) => {
+  11 |     await blockAds(page);
+  12 |   });
+  13 | 
+  14 |   test(`Test Case 10: Verify Subscription in home page ${TAGS.REGRESSION}`, async ({ page, cartPage }) => {
+  15 |     await page.goto('/');
+  16 |     await cartPage.subscribe(DataFactory.email());
+  17 |     expect(await cartPage.getSubscriptionSuccessMessage()).toContain('You have been successfully subscribed!');
+  18 |   });
+  19 | 
+  20 |   test(`Test Case 11: Verify Subscription in Cart page ${TAGS.REGRESSION}`, async ({ page, cartPage }) => {
+  21 |     await page.goto('/');
+  22 |     await page.getByRole('link', { name: 'Cart', exact: true }).click();
+  23 |     await cartPage.subscribe(DataFactory.email());
+  24 |     expect(await cartPage.getSubscriptionSuccessMessage()).toContain('You have been successfully subscribed!');
+  25 |   });
+  26 | 
+  27 |   test(`Test Case 12: Add Products in Cart ${TAGS.SMOKE}`, async ({ page, productPage, cartPage }) => {
+  28 |     await page.goto('/products');
+  29 |     await productPage.addFirstProductToCart();
+  30 |     await productPage.clickContinueShopping();
+  31 |     await productPage.addSecondProductToCart();
+  32 |     await productPage.clickViewCart();
+> 33 |     expect(await cartPage.getCartProductCount()).toBe(2);
+     |                                                  ^ Error: expect(received).toBe(expected) // Object.is equality
+  34 |   });
+  35 | 
+  36 |   test(`Test Case 13: Verify Product quantity in Cart ${TAGS.REGRESSION}`, async ({ page, productPage }) => {
+  37 |     await page.goto('/');
+  38 |     await productPage.viewFirstProduct();
+  39 |     await productPage.setQuantity(4);
+  40 |     await productPage.addToCartFromDetail();
+  41 |     await productPage.clickViewCart();
+  42 |     await expect(page.locator('.cart_quantity button')).toHaveText('4');
+  43 |   });
+  44 | 
+  45 |   test(`Test Case 17: Remove Products From Cart ${TAGS.REGRESSION}`, async ({ page, productPage, cartPage }) => {
+  46 |     await page.goto('/');
+  47 |     await productPage.addFirstProductToCart();
+  48 |     await productPage.clickViewCart();
+  49 |     await cartPage.removeFirstProduct();
+  50 |     await expect(page.locator('#empty_cart')).toBeVisible();
+  51 |   });
+  52 | 
+  53 |   test(`Test Case 22: Add to cart from Recommended items ${TAGS.REGRESSION}`, async ({ page, productPage, cartPage }) => {
+  54 |     await page.goto('/');
+  55 |     await productPage.addRecommendedProductToCart();
+  56 |     await page.locator('u', { hasText: 'View Cart' }).click();
+  57 |     expect(await cartPage.getCartProductCount()).toBeGreaterThan(0);
+  58 |   });
+  59 | 
+  60 | });
+  61 | 
+```
