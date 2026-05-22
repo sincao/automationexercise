@@ -1,6 +1,8 @@
 import { test as base } from '@playwright/test';
 import { LoginPage, SignupPage, ContactUsPage, ProductPage, CartPage, CheckoutPage, PaymentPage } from '@pages';
 import { ProductApiService } from '@api-services/product.api.service';
+import { BrandApiService } from '@api-services/brand.api.service';
+import { UserApiService } from '@api-services/user.api.service';
 
 // ─── Fixture Type Definitions ────────────────────────────────────────────────
 
@@ -16,6 +18,8 @@ export interface PageFixtures {
 
 export interface ApiFixtures {
   productApiService: ProductApiService;
+  brandApiService: BrandApiService;
+  userApiService: UserApiService;
 }
 
 export interface DataFixtures {
@@ -62,6 +66,14 @@ export const test = base.extend<AllFixtures>({
 
   productApiService: async ({ request }, use) => {
     await use(new ProductApiService(request));
+  },
+
+  brandApiService: async ({ request }, use) => {
+    await use(new BrandApiService(request));
+  },
+
+  userApiService: async ({ request }, use) => {
+    await use(new UserApiService(request));
   },
 
 });

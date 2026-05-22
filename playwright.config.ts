@@ -83,7 +83,6 @@ export default defineConfig({
       testDir: './tests/api',
       use: {
         baseURL: envConfig.apiBaseURL,
-        extraHTTPHeaders: { 'Content-Type': 'application/json' },
       },
     },
   ],

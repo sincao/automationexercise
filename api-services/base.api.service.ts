@@ -59,6 +59,24 @@ export abstract class BaseApiService {
     return this.parseResponse<T>(response);
   }
 
+  protected async postForm<T>(
+    path: string,
+    form?: Record<string, string | number | boolean>,
+    options?: { headers?: Record<string, string> },
+  ): Promise<T> {
+    const url = this.buildUrl(path);
+    logApiRequest('POST (Multipart)', url, form);
+    const start = Date.now();
+
+    const response = await this.apiContext.post(url, {
+      multipart: form,
+      headers: options?.headers,
+    });
+
+    logApiResponse(response.status(), url, Date.now() - start);
+    return this.parseResponse<T>(response);
+  }
+
   protected async put<T>(
     path: string,
     body?: unknown,
@@ -70,6 +88,24 @@ export abstract class BaseApiService {
 
     const response = await this.apiContext.put(url, {
       data: body,
+      headers: options?.headers,
+    });
+
+    logApiResponse(response.status(), url, Date.now() - start);
+    return this.parseResponse<T>(response);
+  }
+
+  protected async putForm<T>(
+    path: string,
+    form?: Record<string, string | number | boolean>,
+    options?: { headers?: Record<string, string> },
+  ): Promise<T> {
+    const url = this.buildUrl(path);
+    logApiRequest('PUT (Multipart)', url, form);
+    const start = Date.now();
+
+    const response = await this.apiContext.put(url, {
+      multipart: form,
       headers: options?.headers,
     });
 
@@ -97,6 +133,24 @@ export abstract class BaseApiService {
     const start = Date.now();
 
     const response = await this.apiContext.delete(url);
+
+    logApiResponse(response.status(), url, Date.now() - start);
+    return this.parseResponse<T>(response);
+  }
+
+  protected async deleteWithForm<T = void>(
+    path: string,
+    form?: Record<string, string | number | boolean>,
+    options?: { headers?: Record<string, string> },
+  ): Promise<T> {
+    const url = this.buildUrl(path);
+    logApiRequest('DELETE (Multipart)', url, form);
+    const start = Date.now();
+
+    const response = await this.apiContext.delete(url, {
+      multipart: form,
+      headers: options?.headers,
+    });
 
     logApiResponse(response.status(), url, Date.now() - start);
     return this.parseResponse<T>(response);

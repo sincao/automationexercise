@@ -17,6 +17,17 @@ export const ROUTES = {
 export const API_ENDPOINTS = {
   PRODUCTS: {
     LIST: '/api/productsList',
+    SEARCH: '/api/searchProduct',
+  },
+  BRANDS: {
+    LIST: '/api/brandsList',
+  },
+  USER: {
+    VERIFY_LOGIN: '/api/verifyLogin',
+    CREATE_ACCOUNT: '/api/createAccount',
+    DELETE_ACCOUNT: '/api/deleteAccount',
+    UPDATE_ACCOUNT: '/api/updateAccount',
+    GET_USER: '/api/getUserDetailByEmail',
   },
 } as const;
 

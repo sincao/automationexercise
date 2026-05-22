@@ -39,4 +39,23 @@ export class ProductApiService extends BaseApiService {
   async getAllProducts(): Promise<ProductsResponse> {
     return this.get<ProductsResponse>(API_ENDPOINTS.PRODUCTS.LIST);
   }
+
+  /**
+   * POST To All Products List (API 2)
+   * This is expected to return 405 Method Not Supported.
+   */
+  async postProductsList(): Promise<any> {
+    return this.postForm(API_ENDPOINTS.PRODUCTS.LIST);
+  }
+
+  /**
+   * POST To Search Product (API 5 & 6)
+   */
+  async searchProduct(searchProduct?: string): Promise<any> {
+    const form: Record<string, string> = {};
+    if (searchProduct) {
+      form.search_product = searchProduct;
+    }
+    return this.postForm(API_ENDPOINTS.PRODUCTS.SEARCH, form);
+  }
 }
