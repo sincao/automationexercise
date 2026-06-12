@@ -1,0 +1,179 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: api/automation-exercise.api.spec.ts >> Automation Exercise API List >> API 7: POST To Verify Login with valid details @api
+- Location: tests/api/automation-exercise.api.spec.ts:39:7
+
+# Error details
+
+```
+ApiError: API request failed: 500 Internal Server Error — https://automationexercise.com/
+```
+
+# Test source
+
+```ts
+  70  | 
+  71  |     const response = await this.apiContext.post(url, {
+  72  |       multipart: form,
+  73  |       headers: options?.headers,
+  74  |     });
+  75  | 
+  76  |     logApiResponse(response.status(), url, Date.now() - start);
+  77  |     return this.parseResponse<T>(response);
+  78  |   }
+  79  | 
+  80  |   protected async put<T>(
+  81  |     path: string,
+  82  |     body?: unknown,
+  83  |     options?: { headers?: Record<string, string> },
+  84  |   ): Promise<T> {
+  85  |     const url = this.buildUrl(path);
+  86  |     logApiRequest('PUT', url, body);
+  87  |     const start = Date.now();
+  88  | 
+  89  |     const response = await this.apiContext.put(url, {
+  90  |       data: body,
+  91  |       headers: options?.headers,
+  92  |     });
+  93  | 
+  94  |     logApiResponse(response.status(), url, Date.now() - start);
+  95  |     return this.parseResponse<T>(response);
+  96  |   }
+  97  | 
+  98  |   protected async putForm<T>(
+  99  |     path: string,
+  100 |     form?: Record<string, string | number | boolean>,
+  101 |     options?: { headers?: Record<string, string> },
+  102 |   ): Promise<T> {
+  103 |     const url = this.buildUrl(path);
+  104 |     logApiRequest('PUT (Multipart)', url, form);
+  105 |     const start = Date.now();
+  106 | 
+  107 |     const response = await this.apiContext.put(url, {
+  108 |       multipart: form,
+  109 |       headers: options?.headers,
+  110 |     });
+  111 | 
+  112 |     logApiResponse(response.status(), url, Date.now() - start);
+  113 |     return this.parseResponse<T>(response);
+  114 |   }
+  115 | 
+  116 |   protected async patch<T>(
+  117 |     path: string,
+  118 |     body?: unknown,
+  119 |   ): Promise<T> {
+  120 |     const url = this.buildUrl(path);
+  121 |     logApiRequest('PATCH', url, body);
+  122 |     const start = Date.now();
+  123 | 
+  124 |     const response = await this.apiContext.patch(url, { data: body });
+  125 | 
+  126 |     logApiResponse(response.status(), url, Date.now() - start);
+  127 |     return this.parseResponse<T>(response);
+  128 |   }
+  129 | 
+  130 |   protected async delete<T = void>(path: string): Promise<T> {
+  131 |     const url = this.buildUrl(path);
+  132 |     logApiRequest('DELETE', url);
+  133 |     const start = Date.now();
+  134 | 
+  135 |     const response = await this.apiContext.delete(url);
+  136 | 
+  137 |     logApiResponse(response.status(), url, Date.now() - start);
+  138 |     return this.parseResponse<T>(response);
+  139 |   }
+  140 | 
+  141 |   protected async deleteWithForm<T = void>(
+  142 |     path: string,
+  143 |     form?: Record<string, string | number | boolean>,
+  144 |     options?: { headers?: Record<string, string> },
+  145 |   ): Promise<T> {
+  146 |     const url = this.buildUrl(path);
+  147 |     logApiRequest('DELETE (Multipart)', url, form);
+  148 |     const start = Date.now();
+  149 | 
+  150 |     const response = await this.apiContext.delete(url, {
+  151 |       multipart: form,
+  152 |       headers: options?.headers,
+  153 |     });
+  154 | 
+  155 |     logApiResponse(response.status(), url, Date.now() - start);
+  156 |     return this.parseResponse<T>(response);
+  157 |   }
+  158 | 
+  159 |   // ─── Response Parsing ─────────────────────────────────────────────────────
+  160 | 
+  161 |   protected async parseResponse<T>(response: APIResponse): Promise<T> {
+  162 |     if (!response.ok()) {
+  163 |       let errorBody: string;
+  164 |       try {
+  165 |         errorBody = JSON.stringify(await response.json());
+  166 |       } catch {
+  167 |         errorBody = await response.text();
+  168 |       }
+  169 | 
+> 170 |       const error = new ApiError(
+      |                     ^ ApiError: API request failed: 500 Internal Server Error — https://automationexercise.com/
+  171 |         `API request failed: ${response.status()} ${response.statusText()} — ${response.url()}`,
+  172 |         response.status(),
+  173 |         errorBody,
+  174 |       );
+  175 | 
+  176 |       logger.error(`[API Error] ${error.message}`, { body: errorBody });
+  177 |       throw error;
+  178 |     }
+  179 | 
+  180 |     // 204 No Content
+  181 |     if (response.status() === 204) {
+  182 |       return undefined as T;
+  183 |     }
+  184 | 
+  185 |     try {
+  186 |       return await response.json() as T;
+  187 |     } catch {
+  188 |       return await response.text() as unknown as T;
+  189 |     }
+  190 |   }
+  191 | 
+  192 |   /**
+  193 |    * Get the raw APIResponse without parsing — useful for asserting status codes in API tests.
+  194 |    */
+  195 |   protected async getRaw(path: string, options?: { params?: Record<string, string> }): Promise<APIResponse> {
+  196 |     const url = this.buildUrl(path);
+  197 |     return this.apiContext.get(url, options);
+  198 |   }
+  199 | 
+  200 |   protected async postRaw(path: string, body?: unknown): Promise<APIResponse> {
+  201 |     const url = this.buildUrl(path);
+  202 |     return this.apiContext.post(url, { data: body });
+  203 |   }
+  204 | 
+  205 |   // ─── Helpers ──────────────────────────────────────────────────────────────
+  206 | 
+  207 |   private buildUrl(path: string): string {
+  208 |     // If path already starts with http, use as-is
+  209 |     if (path.startsWith('http')) return path;
+  210 |     return `${this.basePath}${path.startsWith('/') ? '' : '/'}${path}`;
+  211 |   }
+  212 | }
+  213 | 
+  214 | // ─── Custom Error Class ───────────────────────────────────────────────────────
+  215 | 
+  216 | export class ApiError extends Error {
+  217 |   constructor(
+  218 |     message: string,
+  219 |     public readonly statusCode: number,
+  220 |     public readonly responseBody: string,
+  221 |   ) {
+  222 |     super(message);
+  223 |     this.name = 'ApiError';
+  224 |   }
+  225 | }
+  226 | 
+```
