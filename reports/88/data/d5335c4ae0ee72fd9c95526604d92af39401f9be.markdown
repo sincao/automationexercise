@@ -1,0 +1,47 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: api/products.api.spec.ts >> Products API >> API 1: Get All Products List @api @smoke
+- Location: tests/api/products.api.spec.ts:5:7
+
+# Error details
+
+```
+Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: 200
+Received: undefined
+```
+
+# Test source
+
+```ts
+  1  | import { test, expect } from '../../fixtures/test.fixture';
+  2  | import { TAGS } from '../../constants';
+  3  | 
+  4  | test.describe('Products API', () => {
+  5  |   test(`API 1: Get All Products List ${TAGS.API} ${TAGS.SMOKE}`, async ({ productApiService }) => {
+  6  |     // Act
+  7  |     const response = await productApiService.getAllProducts();
+  8  | 
+  9  |     // Assert
+> 10 |     expect(response.responseCode).toBe(200);
+     |                                   ^ Error: expect(received).toBe(expected) // Object.is equality
+  11 |     expect(response.products.length).toBeGreaterThan(0);
+  12 |     
+  13 |     // Validate first product structure as a sample
+  14 |     const firstProduct = response.products[0];
+  15 |     expect(firstProduct).toHaveProperty('id');
+  16 |     expect(firstProduct).toHaveProperty('name');
+  17 |     expect(firstProduct).toHaveProperty('price');
+  18 |     expect(firstProduct).toHaveProperty('brand');
+  19 |     expect(firstProduct).toHaveProperty('category');
+  20 |   });
+  21 | });
+  22 | 
+```
