@@ -1,0 +1,104 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: ui/auth/authentication.spec.ts >> Authentication >> Test Case 4: Logout User @smoke @auth
+- Location: tests/ui/auth/authentication.spec.ts:68:7
+
+# Error details
+
+```
+TimeoutError: locator.check: Timeout 20000ms exceeded.
+Call log:
+  - waiting for locator('#id_gender1')
+
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - heading "This website is under heavy load (queue full)" [level=2] [ref=e2]
+  - paragraph [ref=e3]: We're sorry, too many people are accessing this website at the same time. We're working on this problem. Please try again later.
+```
+
+# Test source
+
+```ts
+  1  | import { Page } from '@playwright/test';
+  2  | import { BasePage } from '@pages/base.page';
+  3  | import { SignupLocators } from '@locators/signup.locators';
+  4  | import { UserData } from '@utils/data.factory';
+  5  | import { logStep } from '@utils/logger';
+  6  | 
+  7  | export class SignupPage extends BasePage {
+  8  |   private readonly locators: SignupLocators;
+  9  | 
+  10 |   constructor(page: Page) {
+  11 |     super(page);
+  12 |     this.locators = new SignupLocators(page);
+  13 |   }
+  14 | 
+  15 |   get path(): string { return '/login'; }
+  16 | 
+  17 |   async assertPageLoaded(): Promise<void> {
+  18 |     await this.locators.signupNameInput.waitFor({ state: 'visible', timeout: 15_000 });
+  19 |   }
+  20 | 
+  21 |   async fillInitialSignup(name: string, email: string) {
+  22 |     logStep(`Signup with Name: ${name}, Email: ${email}`);
+  23 |     await this.locators.signupNameInput.fill(name);
+  24 |     await this.locators.signupEmailInput.fill(email);
+  25 |     await this.locators.signupButton.click();
+  26 |   }
+  27 | 
+  28 |   async fillAccountDetails(user: UserData) {
+  29 |     logStep('Filling Account Information');
+> 30 |     if (user.title === 'Mr.') await this.locators.titleMr.check();
+     |                                                           ^ TimeoutError: locator.check: Timeout 20000ms exceeded.
+  31 |     else await this.locators.titleMrs.check();
+  32 |     
+  33 |     await this.locators.passwordInput.fill(user.password);
+  34 |     await this.locators.daysSelect.selectOption(user.days);
+  35 |     await this.locators.monthsSelect.selectOption(user.months);
+  36 |     await this.locators.yearsSelect.selectOption(user.years);
+  37 |     
+  38 |     await this.locators.newsletterCheckbox.check();
+  39 |     await this.locators.specialOffersCheckbox.check();
+  40 |   }
+  41 | 
+  42 |   async fillAddressDetails(user: UserData) {
+  43 |     logStep('Filling Address Information');
+  44 |     await this.locators.firstNameInput.fill(user.firstName);
+  45 |     await this.locators.lastNameInput.fill(user.lastName);
+  46 |     await this.locators.companyInput.fill(user.company);
+  47 |     await this.locators.address1Input.fill(user.address1);
+  48 |     await this.locators.address2Input.fill(user.address2);
+  49 |     await this.locators.countrySelect.selectOption(user.country);
+  50 |     await this.locators.stateInput.fill(user.state);
+  51 |     await this.locators.cityInput.fill(user.city);
+  52 |     await this.locators.zipcodeInput.fill(user.zipCode);
+  53 |     await this.locators.mobileNumberInput.fill(user.phone);
+  54 |   }
+  55 | 
+  56 |   async clickCreateAccount() {
+  57 |     logStep('Click Create Account');
+  58 |     await this.locators.createAccountButton.click();
+  59 |   }
+  60 | 
+  61 |   async clickContinue() {
+  62 |     await this.locators.continueButton.click();
+  63 |   }
+  64 | 
+  65 |   // ─── State Readers ────────────────────────────────────────────────────────
+  66 |   
+  67 |   getAccountCreatedMsgLocator() {
+  68 |     return this.locators.accountCreatedMsg;
+  69 |   }
+  70 | }
+  71 | 
+```

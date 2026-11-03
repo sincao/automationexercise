@@ -1,0 +1,139 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: ui/auth/authentication.spec.ts >> Authentication >> Test Case 1: Register User @smoke @regression
+- Location: tests/ui/auth/authentication.spec.ts:12:7
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: getByText('Account Deleted!')
+Expected: visible
+Timeout: 20000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 20000ms
+  - waiting for getByText('Account Deleted!')
+
+```
+
+```yaml
+- heading "This website is under heavy load (queue full)" [level=2]
+- paragraph: We're sorry, too many people are accessing this website at the same time. We're working on this problem. Please try again later.
+```
+
+# Test source
+
+```ts
+  1   | import { test, expect } from '../../../fixtures/test.fixture';
+  2   | import { DataFactory } from '../../../utils/data.factory';
+  3   | import { TAGS } from '../../../constants';
+  4   | import { blockAds } from '../../../utils/general.helpers';
+  5   | 
+  6   | test.describe('Authentication', () => {
+  7   | 
+  8   |   test.beforeEach(async ({ page }) => {
+  9   |     await blockAds(page);
+  10  |   });
+  11  | 
+  12  |   test(`Test Case 1: Register User ${TAGS.SMOKE} ${TAGS.REGRESSION}`, async ({ 
+  13  |     page, 
+  14  |     signupPage 
+  15  |   }) => {
+  16  |     const user = DataFactory.user();
+  17  |     await page.goto('/');
+  18  |     await expect(page).toHaveTitle(/Automation Exercise/);
+  19  |     await page.getByRole('link', { name: 'Signup / Login' }).click();
+  20  |     await signupPage.assertPageLoaded();
+  21  |     await signupPage.fillInitialSignup(user.fullName, user.email);
+  22  |     await expect(page.getByText('Enter Account Information')).toBeVisible();
+  23  |     await signupPage.fillAccountDetails(user);
+  24  |     await signupPage.fillAddressDetails(user);
+  25  |     await signupPage.clickCreateAccount();
+  26  |     await expect(signupPage.getAccountCreatedMsgLocator()).toBeVisible();
+  27  |     await signupPage.clickContinue();
+  28  |     await expect(page.getByText(`Logged in as ${user.fullName}`)).toBeVisible();
+  29  |     await page.getByRole('link', { name: 'Delete Account' }).click();
+> 30  |     await expect(page.getByText('Account Deleted!')).toBeVisible();
+      |                                                      ^ Error: expect(locator).toBeVisible() failed
+  31  |     await signupPage.clickContinue();
+  32  |   });
+  33  | 
+  34  |   test(`Test Case 2: Login User with correct email and password ${TAGS.SMOKE} ${TAGS.AUTH}`, async ({ 
+  35  |     page, loginPage, signupPage 
+  36  |   }) => {
+  37  |     const user = DataFactory.user();
+  38  |     // Setup
+  39  |     await page.goto('/');
+  40  |     await loginPage.goToCreateAccount();
+  41  |     await signupPage.fillInitialSignup(user.fullName, user.email);
+  42  |     await signupPage.fillAccountDetails(user);
+  43  |     await signupPage.fillAddressDetails(user);
+  44  |     await signupPage.clickCreateAccount();
+  45  |     await signupPage.clickContinue();
+  46  |     await page.getByRole('link', { name: 'Logout' }).click();
+  47  | 
+  48  |     // Test
+  49  |     await page.goto('/');
+  50  |     await loginPage.goToCreateAccount();
+  51  |     await loginPage.login(user.email, user.password);
+  52  |     await expect(page.getByText(`Logged in as ${user.fullName}`)).toBeVisible();
+  53  |     await page.getByRole('link', { name: 'Delete Account' }).click();
+  54  |     await expect(page.getByText('Account Deleted!')).toBeVisible();
+  55  |   });
+  56  | 
+  57  |   test(`Test Case 3: Login User with incorrect email and password ${TAGS.SMOKE} ${TAGS.AUTH}`, async ({ 
+  58  |     page, loginPage 
+  59  |   }) => {
+  60  |     const invalidUser = DataFactory.user();
+  61  |     await page.goto('/');
+  62  |     await loginPage.goToCreateAccount();
+  63  |     await loginPage.login(invalidUser.email, 'WrongPassword123!');
+  64  |     const errorMsg = await loginPage.getLoginErrorMessage();
+  65  |     expect(errorMsg).toContain('Your email or password is incorrect!');
+  66  |   });
+  67  | 
+  68  |   test(`Test Case 4: Logout User ${TAGS.SMOKE} ${TAGS.AUTH}`, async ({ page, loginPage, signupPage }) => {
+  69  |     const user = DataFactory.user();
+  70  |     await page.goto('/');
+  71  |     await loginPage.goToCreateAccount();
+  72  |     await signupPage.fillInitialSignup(user.fullName, user.email);
+  73  |     await signupPage.fillAccountDetails(user);
+  74  |     await signupPage.fillAddressDetails(user);
+  75  |     await signupPage.clickCreateAccount();
+  76  |     await signupPage.clickContinue();
+  77  | 
+  78  |     await page.goto('/');
+  79  |     await expect(page.getByText(`Logged in as ${user.fullName}`)).toBeVisible();
+  80  |     await page.getByRole('link', { name: 'Logout' }).click();
+  81  |     await expect(page).toHaveURL(/.*\/login/);
+  82  |   });
+  83  | 
+  84  |   test(`Test Case 5: Register User with existing email ${TAGS.REGRESSION} ${TAGS.AUTH}`, async ({ page, loginPage, signupPage }) => {
+  85  |     const user = DataFactory.user();
+  86  |     await page.goto('/');
+  87  |     await loginPage.goToCreateAccount();
+  88  |     await signupPage.fillInitialSignup(user.fullName, user.email);
+  89  |     await signupPage.fillAccountDetails(user);
+  90  |     await signupPage.fillAddressDetails(user);
+  91  |     await signupPage.clickCreateAccount();
+  92  |     await signupPage.clickContinue();
+  93  |     await page.getByRole('link', { name: 'Logout' }).click();
+  94  | 
+  95  |     await page.goto('/');
+  96  |     await loginPage.goToCreateAccount();
+  97  |     await signupPage.fillInitialSignup(user.fullName, user.email);
+  98  |     await expect(page.getByText('Email Address already exist!')).toBeVisible();
+  99  |   });
+  100 | 
+  101 | });
+  102 | 
+```
