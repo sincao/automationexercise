@@ -1,0 +1,166 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: api/automation-exercise.api.spec.ts >> Automation Exercise API List >> API 7: POST To Verify Login with valid details @api
+- Location: tests/api/automation-exercise.api.spec.ts:39:7
+
+# Error details
+
+```
+Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: 200
+Received: undefined
+```
+
+# Test source
+
+```ts
+  1   | import { test, expect } from '../../fixtures/test.fixture';
+  2   | import { TAGS } from '../../constants';
+  3   | import { DataFactory, UserData } from '../../utils/data.factory';
+  4   | 
+  5   | test.describe('Automation Exercise API List', () => {
+  6   | 
+  7   |   test(`API 2: POST To All Products List ${TAGS.API}`, async ({ productApiService }) => {
+  8   |     const response = await productApiService.postProductsList();
+  9   |     expect(response.responseCode).toBe(405);
+  10  |     expect(response.message).toBe('This request method is not supported.');
+  11  |   });
+  12  | 
+  13  |   test(`API 3: Get All Brands List ${TAGS.API}`, async ({ brandApiService }) => {
+  14  |     const response = await brandApiService.getBrandsList();
+  15  |     expect(response.responseCode).toBe(200);
+  16  |     expect(response.brands.length).toBeGreaterThan(0);
+  17  |     expect(response.brands[0]).toHaveProperty('id');
+  18  |     expect(response.brands[0]).toHaveProperty('brand');
+  19  |   });
+  20  | 
+  21  |   test(`API 4: PUT To All Brands List ${TAGS.API}`, async ({ brandApiService }) => {
+  22  |     const response = await brandApiService.putBrandsList();
+  23  |     expect(response.responseCode).toBe(405);
+  24  |     expect(response.message).toBe('This request method is not supported.');
+  25  |   });
+  26  | 
+  27  |   test(`API 5: POST To Search Product ${TAGS.API}`, async ({ productApiService }) => {
+  28  |     const response = await productApiService.searchProduct('top');
+  29  |     expect(response.responseCode).toBe(200);
+  30  |     expect(response.products.length).toBeGreaterThan(0);
+  31  |   });
+  32  | 
+  33  |   test(`API 6: POST To Search Product without search_product parameter ${TAGS.API}`, async ({ productApiService }) => {
+  34  |     const response = await productApiService.searchProduct();
+  35  |     expect(response.responseCode).toBe(400);
+  36  |     expect(response.message).toBe('Bad request, search_product parameter is missing in POST request.');
+  37  |   });
+  38  | 
+  39  |   test(`API 7: POST To Verify Login with valid details ${TAGS.API}`, async ({ userApiService }) => {
+  40  |     // We need a real user. We'll create one first using API 11.
+  41  |     const user = DataFactory.user();
+  42  |     await userApiService.createAccount(mapUserToApi(user));
+  43  | 
+  44  |     const response = await userApiService.verifyLogin({ email: user.email, password: user.password });
+> 45  |     expect(response.responseCode).toBe(200);
+      |                                   ^ Error: expect(received).toBe(expected) // Object.is equality
+  46  |     expect(response.message).toBe('User exists!');
+  47  | 
+  48  |     // Cleanup
+  49  |     await userApiService.deleteAccount({ email: user.email, password: user.password });
+  50  |   });
+  51  | 
+  52  |   test(`API 8: POST To Verify Login without email parameter ${TAGS.API}`, async ({ userApiService }) => {
+  53  |     const response = await userApiService.verifyLogin({ password: 'password123' });
+  54  |     expect(response.responseCode).toBe(400);
+  55  |     expect(response.message).toBe('Bad request, email or password parameter is missing in POST request.');
+  56  |   });
+  57  | 
+  58  |   test(`API 9: DELETE To Verify Login ${TAGS.API}`, async ({ userApiService }) => {
+  59  |     const response = await userApiService.deleteVerifyLogin();
+  60  |     expect(response.responseCode).toBe(405);
+  61  |     expect(response.message).toBe('This request method is not supported.');
+  62  |   });
+  63  | 
+  64  |   test(`API 10: POST To Verify Login with invalid details ${TAGS.API}`, async ({ userApiService }) => {
+  65  |     const response = await userApiService.verifyLogin({ email: 'nonexistent@example.com', password: 'wrongpassword' });
+  66  |     expect(response.responseCode).toBe(404);
+  67  |     expect(response.message).toBe('User not found!');
+  68  |   });
+  69  | 
+  70  |   test(`API 11: POST To Create/Register User Account ${TAGS.API}`, async ({ userApiService }) => {
+  71  |     const user = DataFactory.user();
+  72  |     const response = await userApiService.createAccount(mapUserToApi(user));
+  73  |     expect(response.responseCode).toBe(201);
+  74  |     expect(response.message).toBe('User created!');
+  75  | 
+  76  |     // Cleanup
+  77  |     await userApiService.deleteAccount({ email: user.email, password: user.password });
+  78  |   });
+  79  | 
+  80  |   test(`API 12: DELETE METHOD To Delete User Account ${TAGS.API}`, async ({ userApiService }) => {
+  81  |     const user = DataFactory.user();
+  82  |     await userApiService.createAccount(mapUserToApi(user));
+  83  | 
+  84  |     const response = await userApiService.deleteAccount({ email: user.email, password: user.password });
+  85  |     expect(response.responseCode).toBe(200);
+  86  |     expect(response.message).toBe('Account deleted!');
+  87  |   });
+  88  | 
+  89  |   test(`API 13: PUT METHOD To Update User Account ${TAGS.API}`, async ({ userApiService }) => {
+  90  |     const user = DataFactory.user();
+  91  |     await userApiService.createAccount(mapUserToApi(user));
+  92  | 
+  93  |     const updatedUser = { ...user, fullName: 'Updated Name', company: 'Updated Company' };
+  94  |     const response = await userApiService.updateAccount(mapUserToApi(updatedUser));
+  95  |     expect(response.responseCode).toBe(200);
+  96  |     expect(response.message).toBe('User updated!');
+  97  | 
+  98  |     // Cleanup
+  99  |     await userApiService.deleteAccount({ email: user.email, password: user.password });
+  100 |   });
+  101 | 
+  102 |   test(`API 14: GET user account detail by email ${TAGS.API}`, async ({ userApiService }) => {
+  103 |     const user = DataFactory.user();
+  104 |     await userApiService.createAccount(mapUserToApi(user));
+  105 | 
+  106 |     const response = await userApiService.getUserDetail(user.email);
+  107 |     expect(response.responseCode).toBe(200);
+  108 |     expect(response.user.email).toBe(user.email);
+  109 |     expect(response.user.name).toBe(user.fullName);
+  110 | 
+  111 |     // Cleanup
+  112 |     await userApiService.deleteAccount({ email: user.email, password: user.password });
+  113 |   });
+  114 | 
+  115 | });
+  116 | 
+  117 | /**
+  118 |  * Helper to map UserData from DataFactory to parameters expected by the API.
+  119 |  */
+  120 | function mapUserToApi(user: UserData): Record<string, string> {
+  121 |   return {
+  122 |     name: user.fullName,
+  123 |     email: user.email,
+  124 |     password: user.password,
+  125 |     title: user.title,
+  126 |     birth_date: user.days,
+  127 |     birth_month: user.months,
+  128 |     birth_year: user.years,
+  129 |     firstname: user.firstName,
+  130 |     lastname: user.lastName,
+  131 |     company: user.company,
+  132 |     address1: user.address1,
+  133 |     address2: user.address2,
+  134 |     country: user.country,
+  135 |     zipcode: user.zipCode,
+  136 |     state: user.state,
+  137 |     city: user.city,
+  138 |     mobile_number: user.phone,
+  139 |   };
+  140 | }
+  141 | 
+```
